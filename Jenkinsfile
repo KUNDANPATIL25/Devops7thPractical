@@ -3,7 +3,7 @@ pipeline {
     
     environment {
         WAR_FILE_PATH = 'target/my-java-app.war'
-        TOMCAT_URL = 'http://localhost:8080/manager/text'
+        TOMCAT_URL = 'http://localhost:9090/manager/text'
         TOMCAT_CREDENTIALS_ID = 'tomcat-credentials'
     }
     
