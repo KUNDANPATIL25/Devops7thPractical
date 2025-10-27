@@ -1,0 +1,4 @@
+- [x] Create pom.xml for Maven web application
+- [x] Create src/main/java/com/example/HelloServlet.java
+- [x] Create src/main/webapp/WEB-INF/web.xml
+- [x] Create Jenkinsfile with pipeline stages: Checkout, Build, Test, Deploy
