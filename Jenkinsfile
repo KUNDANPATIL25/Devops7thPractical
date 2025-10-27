@@ -10,43 +10,64 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Checkout source code from version control
-                // Replace with your actual repository URL
-                git 'https://github.com/KUNDANPATIL25/Devops7thPractical.git'
+                git branch: 'main', url: 'https://github.com/KUNDANPATIL25/Devops7thPractical.git'
                 echo 'Checkout stage: Source code checked out'
             }
         }
 
         stage('Build') {
             steps {
-                // Use Maven to build the application
-                bat 'mvn clean package'
+                bat 'mvn clean compile'
+                echo 'Build stage: Application compiled successfully'
             }
         }
 
         stage('Test') {
             steps {
-                // Run tests using Maven
                 bat 'mvn test'
+                echo 'Test stage: Tests completed'
+            }
+        }
+
+        stage('Package') {
+            steps {
+                bat 'mvn package -DskipTests'
+                echo 'Package stage: WAR file created'
             }
         }
 
         stage('Deploy') {
             steps {
-                // Deploy the application to the Tomcat server using Manager API
-                bat '''
-                curl -u %TOMCAT_USER%:%TOMCAT_PASS% --upload-file target/jenkins-pipeline-app-1.0-SNAPSHOT.war "%TOMCAT_URL%/deploy?path=/jenkins-app&update=true"
-                '''
+                script {
+                    // Check if WAR file exists
+                    def warFile = 'target/jenkins-pipeline-app-1.0-SNAPSHOT.war'
+                    if (fileExists(warFile)) {
+                        echo "Deploying ${warFile} to Tomcat"
+                        // Using single quotes to avoid variable expansion in bat
+                        bat """
+                            curl -u ${TOMCAT_USER}:${TOMCAT_PASS} --upload-file ${warFile} "${TOMCAT_URL}/deploy?path=/jenkins-app&update=true"
+                        """
+                    } else {
+                        error "WAR file not found: ${warFile}"
+                    }
+                }
             }
         }
     }
 
     post {
+        always {
+            echo 'Pipeline execution completed'
+            // Clean up workspace or archive artifacts if needed
+            archiveArtifacts artifacts: 'target/*.war', fingerprint: true
+        }
         success {
-            echo 'Pipeline succeeded!'
+            echo 'Pipeline succeeded! Application deployed successfully.'
+            // You can add notifications here (email, Slack, etc.)
         }
         failure {
-            echo 'Pipeline failed!'
+            echo 'Pipeline failed! Check the logs for details.'
+            // You can add failure notifications here
         }
     }
 }
