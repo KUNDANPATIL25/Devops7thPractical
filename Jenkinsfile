@@ -40,7 +40,7 @@ pipeline {
             steps {
                 script {
                     // Check if WAR file exists
-                    def warFile = 'target/jenkins-pipeline-app-1.0-SNAPSHOT.war'
+                    def warFile = 'target/my-java-app.war'
                     if (fileExists(warFile)) {
                         echo "Deploying ${warFile} to Tomcat"
                         // Using single quotes to avoid variable expansion in bat
